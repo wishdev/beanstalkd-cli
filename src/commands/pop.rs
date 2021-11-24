@@ -1,6 +1,6 @@
 use beanstalkd::Beanstalkd;
 
-pub fn pop(beanstalkd: &mut Beanstalkd, tubes: Vec<&str>) {
+pub fn pop(beanstalkd: &mut Beanstalkd, tubes: Vec<&str>, output_id: bool) {
     if !(tubes.len() == 1 && tubes[0] == "default") {
         let _ = beanstalkd.ignore("default");
         for tube in tubes {
@@ -8,6 +8,10 @@ pub fn pop(beanstalkd: &mut Beanstalkd, tubes: Vec<&str>) {
         }
     }
     let (id, message) = beanstalkd.reserve().unwrap();
-    println!("{}", message);
+    if output_id {
+        println!("{} {}", id, message);
+    } else {
+        println!("{}", message);
+    }
     let _ = beanstalkd.delete(id);
 }

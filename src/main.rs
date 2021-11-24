@@ -31,6 +31,8 @@ Options:
     -h, --host=<host>  Hostname of the beanstalkd server [default: localhost]
     -p, --port=<port>  Port of the beanstalkd server [default: 11300]
     -t, --tube=<tube>  Tube to put/pop/peek from - pop can use multiple tubes comma separated
+    -i, --id           Output id with message
+    -I, --id-only      Output only the id (works only with peeking)
     --help             Display this message
     -v, --version      Print version info and exit
 ";
@@ -40,6 +42,8 @@ struct Args {
     flag_host: String,
     flag_port: u16,
     flag_tube: String,
+    flag_id: bool,
+    flag_id_only: bool,
     cmd_put: bool,
     arg_message: String,
     cmd_pop: bool,
@@ -73,9 +77,9 @@ fn main() {
     if args.cmd_put {
         commands::put::put(&mut beanstalkd, args.arg_message, tubes[0]);
     } else if args.cmd_pop {
-        commands::pop::pop(&mut beanstalkd, tubes);
+        commands::pop::pop(&mut beanstalkd, tubes, args.flag_id);
     } else if args.cmd_peek {
-        commands::peek::peek(&mut beanstalkd, args.arg_type_or_id, tubes[0]);
+        commands::peek::peek(&mut beanstalkd, args.arg_type_or_id, tubes[0], args.flag_id, args.flag_id_only);
     } else if args.cmd_monitor {
         commands::monitor::monitor(&mut beanstalkd);
     } else if args.cmd_stats {
